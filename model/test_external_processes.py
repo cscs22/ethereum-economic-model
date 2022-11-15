@@ -8,18 +8,18 @@ def test_market_price_process():
     dt = 225 # that's 225 epochs in a day
     timesteps = 5 # our simulation range will be 5 days (with the above `dt`)
 
-    p = create_market_price_process(date_start, dt=dt, timesteps=timesteps)
+    pr = create_market_price_process(date_start, dt=dt, timesteps=timesteps)
 
-    assert p(0, 0) == 737.71 # Day 0 (timesteps 0..224)
-    assert p(0, 50) == 737.71 # Day 0 (timesteps 0..224)
-    assert p(0, 225) == 730.4 # Day 1 (225..*)
+    for (timestep, expected_price) in [
+        (1, 737.71), # First day and price
+        (2, 730.4),  # 2nd day
+        (5, 1041.5), # 5th day
+    ]:
+        assert pr(0, timestep * dt) == expected_price
 
-    # Maximum range that our 'p' function can return
-    # given parameters used to construct it
-    assert p(0, dt*timesteps - 1) == 1041.50
-
+    # Raises 'out of bounds' when simulation exceeds timesteps
     with pytest.raises(Exception) as ex:
-        p(0, dt*timesteps)
+        pr(0, dt*(timesteps + 1))
 
     assert ex.match(r"out of bounds")
 

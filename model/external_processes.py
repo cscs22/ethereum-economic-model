@@ -34,7 +34,9 @@ def create_market_price_process(date_start, dt, timesteps):
         date_start + datetime.timedelta(days=(timesteps*dt/constants.epochs_per_day)), "1d")
 
     def price_process(run, timestep):
-        return market_prices[int(timestep/constants.epochs_per_day)]
+        # Simulation timesteps do not start from 0, they start from "1 * dt", so we need an off-by-one fix
+        day = int(timestep/constants.epochs_per_day) - 1
+        return market_prices[day]
 
     return price_process
 
